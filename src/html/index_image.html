@@ -3,17 +3,13 @@
     <meta charset="utf-8" />
     <title> Title </title>
     <!-- <meta name="google-site-verification" content="xxxxxxxxxxxxx-xxxxxxxxxxxxxxxxx-xxxxxxxxxxx" /> -->
-    <script src="../js/system.min.js"></script> 
-    <script src="../js/named-register.js"></script> 
     
-    <!-- <script type="systemjs-module" src="../js/main.js"></script> -->
-    <link rel="stylesheet" href="../css/styles.css" />
   
 </head>
 
 <body>
     <div id="root">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype=    >
             <div>
               <label for="file">Choose file to upload</label>
               <input type="file" id="file" name="file" multiple onchange="
@@ -29,34 +25,42 @@
           <div>
             <button onclick="
                 const img = document.querySelector('#preview');
-                try {
-                    fetch('https:/\/us-central1-website-382116.cloudfunctions.net/predict', {
-                    method: 'POST',
-                    files: document.querySelector('input').files[0],
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Methods': '*',
-                        'Access-Control-Allow-Headers': '*'
-                    },
-                    mode: 'cors',
-                        }).then(result => {
-                            if (result.status == 200) {
-                                result.json().then(result=>{console.log(result); return result;})
-                
-                            }
-                            else {
-                                console.log(result);
-                                console.log(`CODE: ${result.status}`);
-                            }
-                            return;
-                        });
-                    }
-                catch (e) {
-                    console.log(e);
-                    return new Promise((res) => res({ content: ['A', 'B'] }));
-                }
-                
+                fetch(img.src)
+                        .then((res) => res.blob())
+                        .then((blob) => {
+                            // Read the Blob as DataURL using the FileReader API
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                                console.log(reader.result);
+                                const base64 = getBase64StringFromDataURL(reader.result);
+                                try {
+                                    fetch('https://server.com', {
+                                    method: 'POST',
+                                    data: {'content': base64}, 
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Access-Control-Allow-Origin': '*',
+                                        'Access-Control-Allow-Methods': '*',
+                                        'Access-Control-Allow-Headers': '*'
+                                    },
+                                    mode: 'cors',
+                                        }).then(result => {
+                                            if (result.status == 200) {
+                                                result.json().then(result=>{console.log(result); return result;})
+                                
+                                            }
+                                            else {
+                                                console.log(result);
+                                                console.log(`CODE: ${result.status}`);
+                                            }
+                                            return;
+                                        });
+                                    }
+                                catch (e) {
+                                    console.log(e);
+                                    return new Promise((res) => res({ content: ['A', 'B'] }));
+                                }
+                            }});
                        ">Submit</button>
           </div>
     </div>
